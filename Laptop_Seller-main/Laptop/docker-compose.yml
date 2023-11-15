@@ -1,0 +1,35 @@
+version: '3'
+
+volumes:
+  mysql-room:
+
+services:
+  mysql-database:
+    image: 'mysql:latest'
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=laptopsdb
+    volumes:
+      - mysql-room:/var/lib/mysql
+      - ./init1:/docker-entrypoint-initdb.d
+      
+    ports:
+      - "3307:3306"
+    
+  docker-container-laptop:
+    image: laptop.jar
+    ports:
+      - "9090:9191"
+   
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-database:3306/laptopsdb
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "root"
+    build:
+      context: "./"
+      dockerfile: "Dockerfile"
+    depends_on:
+      - mysql-database
+      
